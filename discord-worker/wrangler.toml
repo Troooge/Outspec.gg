@@ -1,0 +1,10 @@
+name = "augury-discord"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+APP_ID = "1574597316944597042"
+DISCORD_PUBLIC_KEY = "08de742647201d89711f5424a97b11016c4e4b9e5b12b4249d0c0a372c70d44b"
+STAFF_ROLE_IDS = "1574598839023829002,1574598840000970803"
+
+# Secret, set with: npx wrangler secret put DISCORD_BOT_TOKEN

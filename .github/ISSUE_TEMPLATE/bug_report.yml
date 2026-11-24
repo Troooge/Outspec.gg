@@ -23,19 +23,14 @@ body:
         3. …
     validations:
       required: true
-  - type: input
-    id: version
+  - type: textarea
+    id: diagnostics
     attributes:
-      label: Augury version
-      description: Shown in Augury → Settings → About
-      placeholder: "0.2.83"
+      label: Diagnostics
+      description: In Augury, open Settings → Copy diagnostics and paste here. It includes your version and setup.
+      render: text
     validations:
       required: true
-  - type: input
-    id: os
-    attributes:
-      label: Windows version
-      placeholder: Windows 11 23H2
   - type: textarea
     id: media
     attributes:
