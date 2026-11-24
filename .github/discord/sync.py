@@ -1,4 +1,4 @@
-"""Discord <-> GitHub sync for Augury.
+"""Discord <-> GitHub sync for Outspec.
 
   python sync.py poll      Discord -> GitHub: new forum posts become issues, replies become comments.
   python sync.py event     GitHub -> Discord: label/close/comment/release events update the Discord post.
@@ -54,7 +54,7 @@ def gh(method, path, body=None):
     return http(method, url, {
         "Authorization": "Bearer " + GTOKEN, "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28", "Content-Type": "application/json",
-        "User-Agent": "augury-discord-sync"}, body)
+        "User-Agent": "outspec-discord-sync"}, body)
 
 
 # ---------- helpers ----------
@@ -70,10 +70,10 @@ def safe_discord(text, limit=1900):
     return text if len(text) <= limit else text[:limit] + "…"
 
 
-FOOTER = {"text": "Augury · Arena companion for League of Legends"}
+FOOTER = {"text": "Outspec · outspec.gg"}
 
 
-def brand(title, text, color=0x8B5CF6, url=None):
+def brand(title, text, color=0xC8AA6E, url=None):
     e = {"color": color, "title": title, "description": text, "footer": FOOTER}
     if url:
         e["url"] = url
@@ -288,11 +288,11 @@ def apply_status(issue, note=True):
             "In Progress": ("🛠️ In progress", "Someone's working on this now.", 0x3B82F6),
             "Fixed": ("🎉 Fixed", "The fix is in and will ship in the next update. We'll ping you when it's out.", 0x22C55E),
             "Won't Fix": ("🚫 Won't fix", "We've decided not to change this one. Thanks for taking the time to post it.", 0x6B7280),
-            "Under Review": ("👀 Under review", "We're looking at this idea.", 0x8B5CF6),
+            "Under Review": ("👀 Under review", "We're looking at this idea.", 0xC8AA6E),
             "Planned": ("🗓️ Planned", "This is on the roadmap.", 0x3B82F6),
             "Shipped": ("🚀 Shipped", "This is built and will be in the next update.", 0x22C55E),
             "Declined": ("🚫 Not planned", "We're not going to build this one, but thanks for pitching it.", 0x6B7280),
-        }.get(want_name, (want_name, "", 0x8B5CF6))
+        }.get(want_name, (want_name, "", 0xC8AA6E))
         dc("POST", f"/channels/{tid}/messages", {
             "content": f"<@{mark['author']}>" if ping else "",
             "embeds": [brand(title, text, color=color)],
@@ -307,7 +307,7 @@ def on_comment(ev):
     if c.get("author_association") not in ("OWNER", "MEMBER", "COLLABORATOR"):
         return
     dc("POST", f"/channels/{mark['thread']}/messages", {"allowed_mentions": NO_PINGS, "embeds": [{
-        "color": 0x8B5CF6, "author": {"name": c['user']['login'], "icon_url": c["user"]["avatar_url"]},
+        "color": 0xC8AA6E, "author": {"name": c['user']['login'], "icon_url": c["user"]["avatar_url"]},
         "description": safe_discord(c["body"], 3900), "url": c["html_url"]}]})
 
 
@@ -317,7 +317,7 @@ def on_release(ev):
         return
     notes = (rel.get("body") or "").strip() or "Bug fixes and improvements."
     dc("POST", f"/channels/{CFG['changelog_channel']}/messages", {"allowed_mentions": NO_PINGS, "embeds": [{
-        "color": 0x8B5CF6, "title": f"📝 {rel.get('name') or rel['tag_name']}",
+        "color": 0xC8AA6E, "title": f"📝 {rel.get('name') or rel['tag_name']}",
         "description": safe_discord(notes, 3900), "footer": FOOTER,
         "timestamp": rel.get("published_at")}]})
     # tell reporters whose fixes shipped: issues closed as completed since the previous release

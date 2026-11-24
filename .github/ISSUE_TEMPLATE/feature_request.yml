@@ -1,11 +1,11 @@
 name: 💡 Feature request
-description: Pitch an idea for Augury
+description: Pitch an idea for Outspec
 labels: [enhancement]
 body:
   - type: textarea
     id: idea
     attributes:
       label: Idea
-      description: What would you like Augury to do, and why?
+      description: What would you like Outspec to do, and why?
     validations:
       required: true

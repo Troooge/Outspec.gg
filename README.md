@@ -1,16 +1,21 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Augury: augment grades and build advice for League of Legends Arena" width="100%">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.png">
+    <img alt="Outspec — Out-spec your opponents." src="assets/banner-light.png" width="640">
+  </picture>
 </p>
 
 <p align="center">
-  <a href="https://discord.gg/feanZupp46"><b>Discord</b></a>
+  <a href="https://outspec.gg"><b>Website</b></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/Troooge/augury/issues/new?template=bug_report.yml"><b>Report a bug</b></a>
+  <a href="https://discord.gg/ugwaArqYuA"><b>Discord</b></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/Troooge/augury/issues/new?template=feature_request.yml"><b>Suggest a feature</b></a>
+  <a href="https://github.com/Troooge/Outspec.gg/issues/new?template=bug_report.yml"><b>Report a bug</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Troooge/Outspec.gg/issues/new?template=feature_request.yml"><b>Suggest a feature</b></a>
 </p>
 
-Augury reads your Arena game as you play. It grades every augment offer for the champion you're on, and plans your build around what you already have. Everything comes from top players' games on the current patch.
+Outspec reads your League of Legends Arena game as you play. It grades every augment offer for the champion you're on, and plans your build around what you already have. Everything comes from top players' games on the current patch.
 
 ## What it does
 
@@ -21,18 +26,18 @@ Augury reads your Arena game as you play. It grades every augment offer for the 
 
 ## Download
 
-Augury isn't out yet. [Join the Discord](https://discord.gg/feanZupp46) and you'll be the first to know when it is.
+Public download is coming soon on [outspec.gg](https://outspec.gg/download/). [Join the Discord](https://discord.gg/ugwaArqYuA) to be notified when it launches.
 
 ## Found a bug? Got an idea?
 
-The best place is the [Discord](https://discord.gg/feanZupp46): post bugs in `#report-a-bug` and ideas in `#feature-requests`. We keep your post updated as we work on it, and ping you when the fix ships. You can also open an issue here.
+The best place is the [Discord](https://discord.gg/ugwaArqYuA): post bugs in `#report-a-bug` and ideas in `#feature-requests`. We keep your post updated as we work on it, and ping you when the fix ships. You can also open an issue here.
 
 For bugs, please paste the output of **Settings → Copy diagnostics** from the app. It tells us your version and setup.
 
-## License
+## Privacy & License
 
-Augury is closed source. All rights reserved.
+See the [Outspec privacy notice](https://outspec.gg/privacy/). Outspec is closed source. All rights reserved.
 
 ---
 
-<sub>Augury isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</sub>
+<sub>Outspec is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</sub>
