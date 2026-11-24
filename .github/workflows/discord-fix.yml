@@ -12,6 +12,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - run: python3 .github/discord/inspect_and_fix_nick.py
+      - run: python3 .github/discord/apply_banners.py
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
