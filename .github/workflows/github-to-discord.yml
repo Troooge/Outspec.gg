@@ -1,0 +1,26 @@
+name: GitHub → Discord
+
+on:
+  issues:
+    types: [labeled, unlabeled, closed, reopened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: read
+  contents: read
+
+concurrency:
+  group: discord-event-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/discord/sync.py event
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

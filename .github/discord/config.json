@@ -1,0 +1,40 @@
+{
+  "guild": "1574153950167564389",
+  "changelog_channel": "1574598876428636160",
+  "forums": {
+    "1574596434882199683": {
+      "kind": "bug",
+      "base_label": "bug",
+      "type_tags": {
+        "Bug": "bug",
+        "Crash": "crash",
+        "UI / Visual": "ui",
+        "Account / Login": "account",
+        "Performance": "performance"
+      },
+      "status": {
+        "needs-info": "Needs Info",
+        "confirmed": "Confirmed",
+        "in-progress": "In Progress",
+        "closed:completed": "Fixed",
+        "closed:not_planned": "Won't Fix",
+        "closed:duplicate": "Won't Fix"
+      }
+    },
+    "1574598886796824647": {
+      "kind": "feature",
+      "base_label": "enhancement",
+      "type_tags": {
+        "Idea": "enhancement"
+      },
+      "status": {
+        "under-review": "Under Review",
+        "planned": "Planned",
+        "in-progress": "Planned",
+        "closed:completed": "Shipped",
+        "closed:not_planned": "Declined",
+        "closed:duplicate": "Declined"
+      }
+    }
+  }
+}

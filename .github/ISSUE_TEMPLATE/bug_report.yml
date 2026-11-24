@@ -1,0 +1,43 @@
+name: 🐞 Bug report
+description: Something in Augury isn't working right
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping make Augury better! Please search existing issues first. If yours is already there, add a 👍 instead.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start an Arena match
+        2. Open the augment overlay
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Augury version
+      description: Shown in Augury → Settings → About
+      placeholder: "0.2.83"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 23H2
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots or video
+      description: Drag files here. Please blur out anything personal.
