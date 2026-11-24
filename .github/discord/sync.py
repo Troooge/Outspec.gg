@@ -70,6 +70,16 @@ def safe_discord(text, limit=1900):
     return text if len(text) <= limit else text[:limit] + "…"
 
 
+FOOTER = {"text": "Augury · Arena companion for League of Legends"}
+
+
+def brand(title, text, color=0x8B5CF6, url=None):
+    e = {"color": color, "title": title, "description": text, "footer": FOOTER}
+    if url:
+        e["url"] = url
+    return e
+
+
 def read_mark(body):
     m = MARK_RE.search(body or "")
     return json.loads(m.group(1)) if m else None
@@ -170,9 +180,10 @@ def poll():
             issue = gh("POST", f"/repos/{REPO}/issues", {"title": t["name"][:250], "body": body, "labels": labels})
             by_thread[tid] = issue
             print("created issue", issue["number"], "for thread", tid)
-            dc("POST", f"/channels/{tid}/messages", {"allowed_mentions": NO_PINGS, "flags": 4,
-                "content": f"Thanks. This is logged as [#{issue['number']}](<{issue['html_url']}>). "
-                           "We'll update the tag here as it moves along."})
+            dc("POST", f"/channels/{tid}/messages", {"allowed_mentions": NO_PINGS, "embeds": [brand(
+                f"📋 Logged as #{issue['number']}",
+                "Thanks for posting. We'll keep the tag on this post up to date as we work on it, "
+                "and anything you add here gets passed along to the team.", url=issue["html_url"])]})
 
     # mirror new Discord replies onto open issues (and stale-closed ones, which reopen on a reply)
     stale_closed = [i for i in linked_issues("closed") if "stale" in {l["name"] for l in i["labels"]}]
@@ -229,8 +240,9 @@ def close_stale():
         gh("PATCH", f"/repos/{REPO}/issues/{issue['number']}", {"state": "closed", "state_reason": "not_planned"})
         try:
             dc("POST", f"/channels/{mark['thread']}/messages", {
-                "content": f"<@{mark['author']}> Closing this for now since we haven't heard back in {STALE_DAYS} days. "
-                           "If it's still happening, reply here and it will reopen.",
+                "content": f"<@{mark['author']}>",
+                "embeds": [brand("💤 Closed for now", f"We haven't heard back in {STALE_DAYS} days, so we've closed this. "
+                                 "If it's still happening, just reply here and it reopens.", color=0x6B7280)],
                 "allowed_mentions": {"users": [mark["author"]]}})
             dc("PATCH", f"/channels/{mark['thread']}", {"archived": True})
         except RuntimeError as e:
@@ -270,12 +282,20 @@ def apply_status(issue, note=True):
     dc("PATCH", f"/channels/{tid}", {"archived": False, "applied_tags": want[:5]})
     if note and want_name:
         ping = want_name in ("Fixed", "Shipped", "Needs Info")
-        msg = {"Needs Info": "We need a bit more information to look into this. Could you reply here with more details?",
-               "Fixed": "This is fixed and will be in the next update.",
-               "Shipped": "This has been added and will be in the next update.",
-               }.get(want_name, f"Status: {want_name}")
+        title, text, color = {
+            "Needs Info": ("❓ Need a bit more info", "Could you reply here with more details? Settings → Copy diagnostics helps a lot.", 0xF59E0B),
+            "Confirmed": ("✅ Confirmed", "We can reproduce this and it's on our list.", 0x22C55E),
+            "In Progress": ("🛠️ In progress", "Someone's working on this now.", 0x3B82F6),
+            "Fixed": ("🎉 Fixed", "The fix is in and will ship in the next update. We'll ping you when it's out.", 0x22C55E),
+            "Won't Fix": ("🚫 Won't fix", "We've decided not to change this one. Thanks for taking the time to post it.", 0x6B7280),
+            "Under Review": ("👀 Under review", "We're looking at this idea.", 0x8B5CF6),
+            "Planned": ("🗓️ Planned", "This is on the roadmap.", 0x3B82F6),
+            "Shipped": ("🚀 Shipped", "This is built and will be in the next update.", 0x22C55E),
+            "Declined": ("🚫 Not planned", "We're not going to build this one, but thanks for pitching it.", 0x6B7280),
+        }.get(want_name, (want_name, "", 0x8B5CF6))
         dc("POST", f"/channels/{tid}/messages", {
-            "content": (f"<@{mark['author']}> " if ping else "") + msg,
+            "content": f"<@{mark['author']}>" if ping else "",
+            "embeds": [brand(title, text, color=color)],
             "allowed_mentions": {"users": [mark["author"]]} if ping else NO_PINGS})
 
 
@@ -297,8 +317,8 @@ def on_release(ev):
         return
     notes = (rel.get("body") or "").strip() or "Bug fixes and improvements."
     dc("POST", f"/channels/{CFG['changelog_channel']}/messages", {"allowed_mentions": NO_PINGS, "embeds": [{
-        "color": 0x8B5CF6, "title": rel.get('name') or rel['tag_name'],
-        "description": safe_discord(notes, 3900),
+        "color": 0x8B5CF6, "title": f"📝 {rel.get('name') or rel['tag_name']}",
+        "description": safe_discord(notes, 3900), "footer": FOOTER,
         "timestamp": rel.get("published_at")}]})
     # tell reporters whose fixes shipped: issues closed as completed since the previous release
     rels = [r for r in gh("GET", f"/repos/{os.environ['GITHUB_REPOSITORY']}/releases?per_page=20")
@@ -313,7 +333,8 @@ def on_release(ev):
         mark = read_mark(issue["body"])
         try:
             dc("POST", f"/channels/{mark['thread']}/messages", {
-                "content": f"<@{mark['author']}> This is out in {rel.get('name') or rel['tag_name']}. Thanks for posting it.",
+                "content": f"<@{mark['author']}>",
+                "embeds": [brand("🚀 It's out", f"This is live in **{rel.get('name') or rel['tag_name']}**. Thanks for posting it.", color=0x22C55E)],
                 "allowed_mentions": {"users": [mark["author"]]}})
         except RuntimeError as e:
             print("notify failed", issue["number"], e)
