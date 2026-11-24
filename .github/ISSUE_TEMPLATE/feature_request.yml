@@ -1,5 +1,5 @@
-name: Feature request
-description: Suggest an idea
+name: 💡 Feature request
+description: Pitch an idea for Augury
 labels: [enhancement]
 body:
   - type: textarea

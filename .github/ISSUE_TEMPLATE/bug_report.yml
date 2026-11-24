@@ -1,5 +1,5 @@
-name: Bug report
-description: Something isn't working
+name: 🐞 Bug report
+description: Something in Augury isn't working right
 labels: [bug]
 body:
   - type: textarea
