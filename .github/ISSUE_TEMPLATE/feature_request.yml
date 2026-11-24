@@ -1,18 +1,11 @@
-name: 💡 Feature request
-description: Suggest an idea for Augury
+name: Feature request
+description: Suggest an idea
 labels: [enhancement]
 body:
   - type: textarea
-    id: problem
-    attributes:
-      label: What problem would this solve?
-      placeholder: "During augment picks I can't tell…"
-    validations:
-      required: true
-  - type: textarea
     id: idea
     attributes:
-      label: Your idea
-      description: How do you imagine it working?
+      label: Idea
+      description: What would you like Augury to do, and why?
     validations:
       required: true

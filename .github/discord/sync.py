@@ -209,7 +209,7 @@ def poll():
         if human and "needs-info" in names:  # reporter answered: hand it back to the team
             gh("DELETE", f"/repos/{REPO}/issues/{issue['number']}/labels/needs-info")
             gh("POST", f"/repos/{REPO}/issues/{issue['number']}/comments",
-               {"body": "🔔 The reporter replied on Discord, so `needs-info` was removed."})
+               {"body": "The reporter replied on Discord, so `needs-info` was removed."})
             issue = gh("GET", f"/repos/{REPO}/issues/{issue['number']}")
             apply_status(issue, note=False)
 

@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 💬 Report it on Discord (fastest)
+  - name: Discord
     url: https://discord.gg/feanZupp46
-    about: Post in #report-an-issue or #feature-requests. Posts sync here automatically and you get status updates in Discord.
+    about: You can also report bugs and post ideas on Discord.
