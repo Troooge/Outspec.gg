@@ -113,7 +113,7 @@ def ensure_labels():
     want = {"discord": "5865F2", "bug": "d73a4a", "enhancement": "a2eeef", "crash": "b60205",
             "ui": "c5def5", "account": "fbca04", "performance": "f9d0c4", "needs-info": "d876e3",
             "confirmed": "0e8a16", "in-progress": "1d76db", "under-review": "bfdadc",
-            "planned": "0052cc"}
+            "planned": "0052cc", "stale": "ededed"}
     for name, color in want.items():
         if name not in have:
             gh("POST", f"/repos/{REPO}/labels", {"name": name, "color": color})
@@ -179,8 +179,9 @@ def poll():
                                 "changes, and replies here are passed along to the team."),
             }]})
 
-    # mirror new Discord replies onto open issues
-    for issue in linked_issues("open"):
+    # mirror new Discord replies onto open issues (and stale-closed ones, which reopen on a reply)
+    stale_closed = [i for i in linked_issues("closed") if "stale" in {l["name"] for l in i["labels"]}]
+    for issue in linked_issues("open") + stale_closed:
         mark = read_mark(issue["body"])
         tid, last = mark["thread"], mark.get("last", mark["thread"])
         try:
@@ -188,9 +189,11 @@ def poll():
         except RuntimeError as e:
             print("thread gone?", tid, e); continue
         msgs = sorted(msgs, key=lambda m: int(m["id"]))
+        human = False
         for m in msgs:
             if m["author"]["id"] == me or m["author"].get("bot") or m.get("type") not in (0, 19):
                 continue
+            human = human or m["author"]["id"] == mark.get("author")
             text = safe_md(m.get("content", ""))
             att = attachments_md(m)
             gh("POST", f"/repos/{REPO}/issues/{issue['number']}/comments", {"body":
@@ -198,11 +201,53 @@ def poll():
         if msgs:
             mark["last"] = msgs[-1]["id"]
             gh("PATCH", f"/repos/{REPO}/issues/{issue['number']}", {"body": write_mark(issue["body"], mark)})
+        names = {l["name"] for l in issue["labels"]}
+        if human and issue["state"] == "closed":  # reporter came back: reopen
+            gh("DELETE", f"/repos/{REPO}/issues/{issue['number']}/labels/stale")
+            issue = gh("PATCH", f"/repos/{REPO}/issues/{issue['number']}", {"state": "open"})
+            print("reopened", issue["number"])
+        if human and "needs-info" in names:  # reporter answered: hand it back to the team
+            gh("DELETE", f"/repos/{REPO}/issues/{issue['number']}/labels/needs-info")
+            gh("POST", f"/repos/{REPO}/issues/{issue['number']}/comments",
+               {"body": "🔔 The reporter replied on Discord, so `needs-info` was removed."})
+            issue = gh("GET", f"/repos/{REPO}/issues/{issue['number']}")
+            apply_status(issue, note=False)
+
+    close_stale()
+
+
+STALE_DAYS = 14
+
+
+def close_stale():
+    """Close needs-info issues nobody has touched for STALE_DAYS. A reply on Discord reopens them."""
+    cutoff = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - STALE_DAYS * 86400))
+    for issue in gh("GET", f"/repos/{REPO}/issues?labels=discord,needs-info&state=open&per_page=100"):
+        if issue["updated_at"] > cutoff:
+            continue
+        mark = read_mark(issue["body"])
+        if not mark:
+            continue
+        gh("POST", f"/repos/{REPO}/issues/{issue['number']}/labels", {"labels": ["stale"]})
+        gh("POST", f"/repos/{REPO}/issues/{issue['number']}/comments", {"body":
+           f"Closing because there's been no reply for {STALE_DAYS} days. A reply in the Discord post reopens it automatically."})
+        gh("PATCH", f"/repos/{REPO}/issues/{issue['number']}", {"state": "closed", "state_reason": "not_planned"})
+        try:
+            dc("POST", f"/channels/{mark['thread']}/messages", {
+                "content": f"<@{mark['author']}> We closed this for now because we didn't hear back in {STALE_DAYS} days. "
+                           "**Reply here with the details and it reopens automatically.**",
+                "allowed_mentions": {"users": [mark["author"]]}})
+            dc("PATCH", f"/channels/{mark['thread']}", {"archived": True})
+        except RuntimeError as e:
+            print("stale notify failed", issue["number"], e)
+        print("closed stale", issue["number"])
 
 
 # ---------- GitHub -> Discord ----------
 
 def status_for(issue, f):
+    if "stale" in {l["name"] for l in issue.get("labels", [])}:
+        return f["status"].get("needs-info")
     if issue["state"] == "closed":
         return f["status"].get("closed:" + (issue.get("state_reason") or "completed"))
     names = {l["name"] for l in issue.get("labels", [])}
